@@ -5,8 +5,12 @@ import { useSDK } from "@metamask/sdk-react";
 import { formatAddress } from "@/lib/utils";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Wallet } from "lucide-react";
+import { useEffect } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export const ConnectWalletButton = () => {
+  const router = useRouter();
   const { sdk, connected, connecting, account } = useSDK();
 
   const connect = async () => {
@@ -16,6 +20,21 @@ export const ConnectWalletButton = () => {
       console.warn(`No accounts found`, err);
     }
   };
+
+  const idExists = async () => {
+    const response = await axios.get(`/api/user?user_account_id=${account}`);
+    if (response.status === 200) {
+      router.push("/");
+    } else {
+      router.push("/register");
+    }
+  };
+
+  useEffect(() => {
+    if (connected && account) {
+      idExists();
+    }
+  }, [sdk, connected, account]);
 
   const disconnect = () => {
     if (sdk) {
