@@ -28,13 +28,14 @@ export async function GET(request: Request) {
     if (!user_account_id) {
       return NextResponse.json({ error: "Account ID is required" }, { status: 400 });
     }
-    const response = await User.findOne({ user_account_id });
+    const id = user_account_id.toLowerCase();
+    const response = await User.findOne({ id });
     console.log(response);
     if (!response) {
-      return NextResponse.json({ user: "User not found" }, { status: 200 });
+      return NextResponse.json({ found: false }, { status: 200 });
     } else {
-      return NextResponse.json({ user: response }, { status: 200 });
-    }
+      return NextResponse.json({ found: true, user: response }, { status: 200 });
+    }    
   } catch (error) {
     console.log(error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
