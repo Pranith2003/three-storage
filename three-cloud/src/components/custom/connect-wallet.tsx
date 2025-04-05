@@ -21,19 +21,23 @@ export const ConnectWalletButton = () => {
   };
 
   const idExists = async () => {
-    const response = await axios.get(`/api/user?user_account_id=${account}`);
-    if (response.status === 200) {
-      console.log(response.data.user);
-      if (response.data.user === "User not found") {
-        router.push("/register");
-      } else {
-        router.push("/dashboard");
+    try {
+      const response = await axios.get(`/api/user?user_account_id=${account}`);
+      if (response.status === 200) {
+        const { found } = response.data;
+        if (found) {
+          router.push("/dashboard");
+        } else {
+          router.push("/register");
+        }
       }
-    } else {
-      console.log("User not found, creating new user...");
+    } catch (err) {
+      console.error("Error checking user:", err);
+      // Optional fallback
+      router.push("/register");
     }
   };
-
+  
   useEffect(() => {
     if (connected && account) {
       idExists();
