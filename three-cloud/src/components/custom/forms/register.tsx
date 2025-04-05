@@ -36,6 +36,7 @@ const RegisterForm = () => {
       });
       if (response.status === 201) {
         console.log("User created successfully");
+        router.push("/dashboard");
       }
       console.log(response.data.message);
     } catch (error) {
@@ -44,7 +45,7 @@ const RegisterForm = () => {
   };
   return (
     <>
-      <Card className="w-full mx-auto shadow-xl rounded-2xl border border-gray-200">
+      <Card className="max-w-xl w-full mx-auto shadow-xl rounded-2xl border border-gray-200">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-center">Register</CardTitle>
           <CardDescription className="text-center text-sm text-gray-500">
