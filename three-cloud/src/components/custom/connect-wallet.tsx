@@ -1,5 +1,4 @@
 "use client";
-// import WalletIcon from "../public/icons/WalletIcon";
 import { Button } from "@/components/ui/button";
 import { useSDK } from "@metamask/sdk-react";
 import { formatAddress } from "@/lib/wallet-utils";
@@ -24,9 +23,14 @@ export const ConnectWalletButton = () => {
   const idExists = async () => {
     const response = await axios.get(`/api/user?user_account_id=${account}`);
     if (response.status === 200) {
-      router.push("/");
+      console.log(response.data.user);
+      if (response.data.user === "User not found") {
+        router.push("/register");
+      } else {
+        router.push("/dashboard");
+      }
     } else {
-      router.push("/register");
+      console.log("User not found, creating new user...");
     }
   };
 
@@ -39,6 +43,7 @@ export const ConnectWalletButton = () => {
   const disconnect = () => {
     if (sdk) {
       sdk.terminate();
+      router.push("/");
     }
   };
 
