@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGO_URI = "mongodb://localhost:27017/";
+const MONGO_URI = "mongodb://127.0.0.1:27017/";
 
 if (!MONGO_URI) {
   throw new Error("MONGODB_URI is not defined");

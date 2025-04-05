@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 
     const response = await User.findOne({ user_account_id });
     if (!response) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ user: "User not found" }, { status: 200 });
     } else {
       return NextResponse.json({ user: response }, { status: 200 });
     }
