@@ -7,9 +7,12 @@ import { Wallet } from "lucide-react";
 import { useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { accountIdAtom } from "@/lib/atom";
+import { useAtom } from "jotai";
 
 export const ConnectWalletButton = () => {
   const router = useRouter();
+  const [id, setId] = useAtom(accountIdAtom);
   const { sdk, connected, connecting, account } = useSDK();
 
   const connect = async () => {
@@ -36,6 +39,7 @@ export const ConnectWalletButton = () => {
 
   useEffect(() => {
     if (connected && account) {
+      setId(account);
       idExists();
     }
   }, [sdk, connected, account]);

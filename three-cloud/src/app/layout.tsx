@@ -27,7 +27,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NavBar />
-        {children}
+        <div className="flex items-center justify-between max-w-screen-xl px-6 mx-auto py-7 rounded-x">
+          {children}
+        </div>
       </body>
     </html>
   );
