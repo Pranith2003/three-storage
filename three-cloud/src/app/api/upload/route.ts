@@ -14,24 +14,29 @@ export async function POST(req: Request) {
     const isPrivate = formData.get('isPrivate') === 'true';
     const walletAddress = formData.get('walletAddress') as string;
 
-    // Convert file to buffer
+    if (!file || !walletAddress) {
+      return NextResponse.json({ error: 'Missing file or wallet address' }, { status: 400 });
+    }
+
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Prepare for Pinata upload
     const pinataData = new FormData();
     pinataData.append('file', buffer, file.name);
 
-    const pinataRes = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', pinataData, {
-      headers: {
-        ...pinataData.getHeaders(),
-        Authorization: `Bearer ${process.env.PINATA_JWT}`,
-      },
-    });
+    const pinataRes = await axios.post(
+      'https://api.pinata.cloud/pinning/pinFileToIPFS',
+      pinataData,
+      {
+        headers: {
+          ...pinataData.getHeaders(),
+          Authorization: process.env.PINATA_JWT!, 
+        },
+      }
+    );
 
     const cid = pinataRes.data.IpfsHash;
 
-    // Save metadata to Mongo
     const newPhoto = new Photo({
       ownerWallet: walletAddress,
       cid,
@@ -43,8 +48,8 @@ export async function POST(req: Request) {
     await newPhoto.save();
 
     return NextResponse.json({ message: 'File uploaded', cid }, { status: 201 });
-  } catch (err) {
-    console.error('Upload error:', err);
-    return NextResponse.json({ error: 'Failed to upload' }, { status: 500 });
+  } catch (err: any) {
+    console.error('❌ Upload error:', err?.response?.data || err);
+    return NextResponse.json({ error: 'Failed to upload to Pinata' }, { status: 500 });
   }
 }
