@@ -2,7 +2,7 @@
 // import WalletIcon from "../public/icons/WalletIcon";
 import { Button } from "@/components/ui/button";
 import { useSDK } from "@metamask/sdk-react";
-import { formatAddress } from "@/lib/utils";
+import { formatAddress } from "@/lib/wallet-utils";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Wallet } from "lucide-react";
 import { useEffect } from "react";
