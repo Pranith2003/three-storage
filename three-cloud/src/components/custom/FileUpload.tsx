@@ -17,53 +17,50 @@ import { Textarea } from '@/components/ui/textarea';
 import { useSDK } from '@metamask/sdk-react';
 
 export default function FileUploadCard() {
-  const { account } = useSDK(); 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState('');
+  const { account } = useSDK(); // connected wallet address
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
   const [description, setDescription] = useState('');
   const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setFileName(file.name);
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setSelectedFiles(Array.from(files));
     }
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !account) {
-      alert('Please select a file and connect your wallet');
+    if (!selectedFiles.length || !account) {
+      alert('Please select files and connect your wallet');
       return;
     }
 
     setUploading(true);
 
     try {
-      const form = new FormData();
-      form.append('file', selectedFile);
-      form.append('description', description);
-      form.append('isPrivate', isPrivate.toString());
-      form.append('walletAddress', account);
+      for (const file of selectedFiles) {
+        const form = new FormData();
+        form.append('file', file);
+        form.append('description', description);
+        form.append('isPrivate', isPrivate.toString());
+        form.append('walletAddress', account);
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: form,
-      });
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: form,
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (res.ok) {
-        alert(`✅ Uploaded to IPFS!\nCID: ${data.cid}`);
-        // Reset form
-        setSelectedFile(null);
-        setFileName('');
-        setDescription('');
-        setIsPrivate(false);
-      } else {
-        throw new Error(data.error || 'Upload failed');
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
+        console.log(`✅ Uploaded ${file.name} → CID: ${data.cid}`);
       }
+
+      alert('✅ All photos uploaded!');
+      setSelectedFiles([]);
+      setDescription('');
+      setIsPrivate(false);
     } catch (error: any) {
       console.error(error);
       alert(`❌ Upload failed: ${error.message}`);
@@ -75,22 +72,28 @@ export default function FileUploadCard() {
   return (
     <Card className="w-full max-w-xl mx-auto">
       <CardHeader>
-        <CardTitle>Upload Photo</CardTitle>
-        <CardDescription>Select a photo, add details, and choose privacy.</CardDescription>
+        <CardTitle>Upload Photos</CardTitle>
+        <CardDescription>Upload multiple photos with optional privacy setting.</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="file">Image File</Label>
-          <Input type="file" id="file" accept="image/*" onChange={handleFileChange} />
-          {fileName && <p className="text-sm text-gray-500">📁 Selected: {fileName}</p>}
+          <Label htmlFor="file">Image Files</Label>
+          <Input type="file" id="file" multiple accept="image/*" onChange={handleFileChange} />
+          {selectedFiles.length > 0 && (
+            <ul className="text-sm text-gray-500 list-disc pl-5">
+              {selectedFiles.map((file, idx) => (
+                <li key={idx}>📁 {file.name}</li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="desc">Description</Label>
           <Textarea
             id="desc"
-            placeholder="e.g., Beach photo from Goa trip"
+            placeholder="e.g., Family vacation photos"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -98,7 +101,7 @@ export default function FileUploadCard() {
 
         <div className="flex items-center space-x-2">
           <Switch id="privacy" checked={isPrivate} onCheckedChange={setIsPrivate} />
-          <Label htmlFor="privacy">Private Photo</Label>
+          <Label htmlFor="privacy">Private Photos</Label>
         </div>
       </CardContent>
 
