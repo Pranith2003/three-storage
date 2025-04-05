@@ -23,6 +23,8 @@ export const ConnectWalletButton = () => {
     }
   };
 
+  console.log(account);
+
   return (
     <div className="relative">
       {connected ? (
@@ -31,7 +33,9 @@ export const ConnectWalletButton = () => {
             <Button>{formatAddress(account)}</Button>
           </PopoverTrigger>
           <PopoverContent className="mt-2 w-44 bg-gray-100 border rounded-md shadow-lg right-0 z-10 top-10">
-            Disconnect
+            <Button onClick={disconnect} className="w-full" variant="outline">
+              Disconnect
+            </Button>
           </PopoverContent>
         </Popover>
       ) : (

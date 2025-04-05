@@ -11,7 +11,7 @@ export const NavBar = () => {
     logging: { developerMode: false },
     checkInstallationImmediately: false,
     dappMetadata: {
-      name: "Next-Metamask-Boilerplate",
+      name: "three-storage",
       url: host, // using the host constant defined above
     },
   };
